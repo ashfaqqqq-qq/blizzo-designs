@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blizzo Designers — We design, you grow</title>
+<meta name="description" content="Blizzo Designers is a Coimbatore-based web design and development studio building premium, conversion-focused websites for local businesses, startups and brands.">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Blizzo Designers — We design, you grow">
+<meta property="og:description" content="Web design, development and digital experiences for businesses that want to stand out online.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_IN">
+
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121212'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' fill='%231E6F46' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================
+   BLIZZO DESIGNERS — design tokens
+   ========================================================== */
+:root{
+  --ink: #121212;
+  --ink-soft: #2A2823;
+  --paper: #EFF1EA;
+  --paper-alt: #E3E6DC;
+  --accent: #1E6F46;
+  --accent-deep: #164F32;
+  --accent-soft: #CFE3D3;
+  --grey: #6E6E68;
+  --line: rgba(18,18,18,0.14);
+  --line-light: rgba(239,241,234,0.2);
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --edge: clamp(24px, 5vw, 96px);
+  --radius: 3px;
+  --ease: cubic-bezier(.22,1,.36,1);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+body{
+  margin:0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img,svg{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+ul{ list-style:none; margin:0; padding:0; }
+h1,h2,h3,h4{ font-family: var(--font-display); font-weight:500; margin:0; }
+p{ margin:0; }
+button{ font-family:inherit; cursor:pointer; }
+
+.skip-link{
+  position:absolute; left:-999px; top:0; background:var(--ink); color:var(--paper);
+  padding:12px 20px; z-index:999;
+}
+.skip-link:focus{ left: var(--edge); }
+
+:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; }
+
+section{ padding: clamp(72px,10vw,140px) var(--edge); }
+
+.section-head{ max-width: 640px; margin-bottom: clamp(40px,6vw,80px); }
+.section-head h2{ font-size: clamp(2rem,4vw,3rem); letter-spacing: -0.01em; }
+.section-head p{ margin-top:14px; color: var(--grey); font-size:1.05rem; max-width: 46ch; }
+.section-head--light h2{ color: var(--paper); }
+
+/* ---- buttons ---- */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding: 15px 30px; border-radius: 999px; font-size:0.95rem; font-weight:500;
+  border:1px solid transparent; white-space:nowrap;
+}
+.btn span{ display:inline-block; will-change:transform; }
+.btn--primary{ background: var(--accent); color:#fff; }
+.btn--primary:hover{ background: var(--accent-deep); }
+.btn--ghost{ border-color: var(--ink); color: var(--ink); }
+.btn--ghost:hover{ background: var(--ink); color: var(--paper); }
+.btn--ghost-light{ border-color: rgba(239,241,234,0.4); color: var(--paper); }
+.btn--ghost-light:hover{ background: var(--paper); color: var(--ink); }
+.btn--dark{ background: var(--ink); color: var(--paper); }
+.btn--dark:hover{ background:#000; }
+.btn--wide{ width:100%; }
+.btn--nav{ padding:11px 22px; font-size:0.9rem; }
+.btn, .link-arrow{ transition: background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease); }
+
+.link-arrow{
+  display:inline-flex; align-items:center; gap:8px; font-weight:500; font-size:0.95rem;
+  border-bottom:1px solid var(--ink); padding-bottom:3px;
+}
+.link-arrow::after{ content:"→"; transition: transform .3s var(--ease); }
+.link-arrow:hover::after{ transform: translateX(4px); }
+
+/* ==========================================================
+   NAV
+   ========================================================== */
+.nav{
+  position: sticky; top:0; z-index:100;
+  background: rgba(239,241,234,0.86);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .3s var(--ease), padding .3s var(--ease);
+}
+.nav.is-scrolled{ border-bottom-color: var(--line); }
+.nav__inner{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 22px var(--edge);
+  transition: padding .3s var(--ease);
+}
+.nav.is-scrolled .nav__inner{ padding-top:14px; padding-bottom:14px; }
+
+.nav__mark{ font-family: var(--font-display); font-size:1.15rem; font-weight:500; }
+.nav__mark span{ color: var(--accent); }
+
+.nav__links{ display:flex; align-items:center; gap:36px; }
+.nav__links a{ font-size:0.95rem; position:relative; }
+.nav__links a::after{
+  content:""; position:absolute; left:0; right:0; bottom:-6px; height:1px;
+  background: var(--ink); transform: scaleX(0); transform-origin:left;
+  transition: transform .3s var(--ease);
+}
+.nav__links a:hover::after{ transform: scaleX(1); }
+.nav__links a.nav__login{ display:inline-flex; align-items:center; gap:6px; }
+
+.nav__actions{ display:flex; align-items:center; gap:18px; }
+
+.nav__toggle{
+  display:none; width:34px; height:24px; background:none; border:none; padding:0;
+  position:relative;
+}
+.nav__toggle span{
+  position:absolute; left:0; right:0; height:1.5px; background:var(--ink);
+  transition: transform .3s var(--ease), opacity .3s var(--ease);
+}
+.nav__toggle span:first-child{ top:2px; }
+.nav__toggle span:last-child{ bottom:2px; }
+.nav__toggle[aria-expanded="true"] span:first-child{ transform: translateY(9px) rotate(45deg); }
+.nav__toggle[aria-expanded="true"] span:last-child{ transform: translateY(-9px) rotate(-45deg); }
+
+.mobile-menu{
+  display:none;
+  position: fixed; inset:0; top:0;
+  background: var(--ink); color: var(--paper);
+  padding: 120px var(--edge) 60px;
+  transform: translateY(-100%);
+  transition: transform .5s var(--ease);
+  z-index:90;
+}
+.mobile-menu.is-open{ transform: translateY(0); }
+.mobile-menu nav{ display:flex; flex-direction:column; gap:22px; }
+.mobile-menu nav a{ font-family: var(--font-display); font-size:2rem; }
+.mobile-menu .btn{ margin-top:40px; }
+.mobile-menu__meta{ margin-top:32px; color: var(--grey); font-size:0.9rem; line-height:1.7; }
+
+/* ==========================================================
+   HERO
+   ========================================================== */
+.hero{
+  padding-top: clamp(120px,16vw,200px);
+  padding-bottom: clamp(60px,8vw,100px);
+  display:flex; flex-direction:column; gap: clamp(50px,8vw,90px);
+}
+.hero__kicker{
+  font-size:0.9rem; color: var(--grey); margin-bottom:22px;
+}
+.hero__headline{
+  font-size: clamp(2.6rem, 8vw, 6.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  font-weight:500;
+  max-width: 16ch;
+}
+.reveal-line{ display:block; overflow:hidden; }
+.reveal-line span{
+  display:block;
+  transform: translateY(110%);
+  opacity:0;
+}
+.hero.is-ready .reveal-line span{
+  transform: translateY(0);
+  opacity:1;
+  transition: transform 0.9s var(--ease), opacity 0.9s var(--ease);
+}
+.hero.is-ready .reveal-line:nth-child(2) span{ transition-delay: .08s; }
+
+.hero__foot{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:40px; flex-wrap:wrap;
+}
+.hero__sub{ max-width: 40ch; font-size:1.15rem; color: var(--ink-soft); }
+.hero__actions{ display:flex; gap:16px; flex-wrap:wrap; }
+.hero__trust{
+  font-size:0.85rem; color: var(--grey); border-top:1px solid var(--line); padding-top:24px;
+}
+
+/* ==========================================================
+   SELECTED WORK
+   ========================================================== */
+.project{
+  display:grid; grid-template-columns: 1.3fr 1fr; gap: clamp(30px,5vw,70px);
+  align-items:center;
+  padding: clamp(30px,5vw,60px) 0;
+  border-top:1px solid var(--line);
+}
+.project:last-child{ border-bottom:1px solid var(--line); }
+.project--reverse{ direction: rtl; }
+.project--reverse > *{ direction: ltr; }
+
+.project__visual{ display:block; overflow:hidden; border-radius: var(--radius); }
+.project__mock{
+  transition: transform .7s var(--ease);
+}
+.project__visual:hover .project__mock{ transform: scale(1.035); }
+
+.project__index{ font-size:0.85rem; color: var(--grey); }
+.project__info h3{ font-size: clamp(1.8rem,3vw,2.6rem); margin-top:8px; }
+.project__industry{ color: var(--accent-deep); font-weight:500; margin-top:8px; font-size:0.95rem; }
+.project__services{ color: var(--grey); margin-top:6px; font-size:0.9rem; }
+.project__desc{ margin-top:18px; max-width: 46ch; color: var(--ink-soft); }
+.project__info .link-arrow{ margin-top:22px; }
+
+/* ==========================================================
+   SERVICES
+   ========================================================== */
+.service-list{ border-top:1px solid var(--line); }
+.service-row{
+  display:grid; grid-template-columns: 60px 1fr 1.4fr; gap:24px; align-items:baseline;
+  padding: 26px 0; border-bottom:1px solid var(--line);
+  position:relative;
+}
+.service-row::before{
+  content:""; position:absolute; inset:0; background: var(--paper-alt);
+  transform: scaleX(0); transform-origin:left; z-index:-1;
+  transition: transform .4s var(--ease);
+}
+.service-row:hover::before{ transform: scaleX(1); }
+.service-row:hover{ padding-left:14px; }
+.service-row{ transition: padding-left .35s var(--ease); }
+.service-row__index{ color: var(--grey); font-size:0.9rem; }
+.service-row__name{ font-size: clamp(1.3rem,2.4vw,1.7rem); }
+.service-row__desc{ color: var(--grey); max-width:44ch; }
+
+/* ==========================================================
+   WHY US
+   ========================================================== */
+.why{ background: var(--ink); color: var(--paper); }
+.why-list{ border-top:1px solid var(--line-light); }
+.why-row{
+  display:grid; grid-template-columns: 60px 1fr 1.6fr; gap:24px;
+  padding: 30px 0; border-bottom:1px solid var(--line-light);
+  align-items:baseline;
+}
+.why-row__index{ color:#8A8A83; font-size:0.9rem; }
+.why-row__title{ font-family: var(--font-display); font-size: clamp(1.3rem,2.2vw,1.6rem); }
+.why-row__desc{ color:#B7B6AE; max-width:48ch; }
+
+/* ==========================================================
+   PROCESS
+   ========================================================== */
+.process-track{ position:relative; }
+.process-line{
+  position:absolute; left:29px; top:8px; bottom:8px; width:1px; background: var(--line);
+}
+.process-line__fill{
+  display:block; width:100%; height:0%; background: var(--accent);
+  transition: height .2s linear;
+}
+.process-step{
+  position:relative; padding-left:70px; padding-bottom: clamp(36px,5vw,56px);
+}
+.process-step:last-child{ padding-bottom:0; }
+.process-step__index{
+  position:absolute; left:0; top:-4px; width:60px;
+  font-size:0.85rem; color: var(--grey);
+}
+.process-step h3{ font-size: clamp(1.4rem,2.6vw,2rem); }
+.process-step p{ margin-top:8px; color: var(--grey); max-width:44ch; }
+
+/* ==========================================================
+   ABOUT
+   ========================================================== */
+.about__grid{ display:grid; grid-template-columns: repeat(3,1fr); gap: clamp(30px,5vw,50px); }
+.about__lead{
+  grid-column: 1 / -1; font-size: clamp(1.6rem,3.4vw,2.6rem); line-height:1.3;
+  max-width: 26ch; margin-bottom:20px; font-weight:500;
+}
+.about__col h4{ font-family: var(--font-body); font-weight:600; font-size:0.95rem; }
+.about__col p{ margin-top:10px; color: var(--grey); }
+
+/* ==========================================================
+   CLIENTS
+   ========================================================== */
+.clients__cloud{ display:flex; flex-wrap:wrap; gap: 14px 18px; }
+.clients__cloud span{
+  font-family: var(--font-display); font-size: clamp(1.3rem,3vw,2.1rem);
+  padding: 6px 4px; border-bottom:1px solid transparent;
+  transition: color .3s var(--ease), border-color .3s var(--ease);
+}
+.clients__cloud span:hover{ color: var(--accent-deep); border-color: currentColor; }
+
+/* ==========================================================
+   TESTIMONIALS
+   ========================================================== */
+.testimonial-placeholder{
+  border:1px solid var(--line); border-radius: var(--radius); padding: clamp(30px,5vw,50px);
+  max-width:640px; color: var(--grey); font-size:1.05rem;
+}
+
+/* ==========================================================
+   CTA
+   ========================================================== */
+.cta{
+  background: var(--ink); color: var(--paper); text-align:left;
+}
+.cta h2{ font-size: clamp(2.2rem,5vw,4rem); max-width:16ch; }
+.cta p{ margin-top:16px; color:#B7B6AE; font-size:1.1rem; max-width:44ch; }
+.cta__actions{ display:flex; gap:16px; flex-wrap:wrap; margin-top:40px; }
+
+/* ==========================================================
+   CONTACT
+   ========================================================== */
+.contact__grid{ display:grid; grid-template-columns: 1.5fr 1fr; gap: clamp(30px,5vw,70px); }
+.contact-form{ display:grid; grid-template-columns: repeat(2,1fr); gap:22px; }
+.field{ grid-column: span 2; display:flex; flex-direction:column; gap:8px; }
+.field--half{ grid-column: span 1; }
+.field label{ font-size:0.85rem; color: var(--grey); }
+.field input, .field select, .field textarea{
+  font-family: inherit; font-size:1rem; padding:13px 4px; background:transparent;
+  border:none; border-bottom:1px solid var(--line); color: var(--ink);
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  border-bottom-color: var(--ink);
+}
+.contact-form__note{ grid-column: span 2; font-size:0.82rem; color: var(--grey); margin-top:-6px; }
+.contact-form__status{ grid-column: span 2; font-size:0.9rem; padding: 4px 0; min-height: 1.4em; }
+.contact-form__status[data-state="error"]{ color: #A23B2E; }
+.contact-form__status[data-state="ok"]{ color: var(--accent-deep); }
+
+.contact-side{ display:flex; flex-direction:column; gap:30px; align-self:start; }
+.contact-side__block h4{ font-family: var(--font-body); font-size:0.85rem; color: var(--grey); font-weight:500; }
+.contact-side__block a, .contact-side__block p{ margin-top:8px; font-size:1.2rem; }
+
+/* ==========================================================
+   FOOTER
+   ========================================================== */
+.footer{ background: var(--ink); color: var(--paper); padding: 70px var(--edge) 30px; }
+.footer__top{
+  display:grid; grid-template-columns: 1.3fr 1fr 1fr; gap:40px;
+  padding-bottom:40px; border-bottom:1px solid var(--line-light);
+}
+.footer__name{ font-family: var(--font-display); font-size:1.4rem; }
+.footer__tag{ margin-top:12px; color:#B7B6AE; max-width:32ch; }
+.footer__nav{ display:flex; flex-direction:column; gap:12px; }
+.footer__contact{ display:flex; flex-direction:column; gap:10px; }
+.footer__contact p{ color:#B7B6AE; }
+.footer__bottom{
+  display:flex; justify-content:space-between; padding-top:24px; color:#8A8A83; font-size:0.85rem; flex-wrap:wrap; gap:10px;
+}
+
+/* ==========================================================
+   REVEALS (scroll)
+   ========================================================== */
+.reveal-on-scroll{ opacity:0; transform: translateY(24px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+.reveal-on-scroll.is-visible{ opacity:1; transform:none; }
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (max-width: 900px){
+  .nav__links{ display:none; }
+  .btn--nav{ display:none; }
+  .nav__toggle{ display:block; }
+  .mobile-menu{ display:block; }
+
+  .project{ grid-template-columns: 1fr; }
+  .project--reverse{ direction: ltr; }
+
+  .service-row{ grid-template-columns: 40px 1fr; }
+  .service-row__desc{ grid-column: span 2; margin-top:6px; }
+
+  .why-row{ grid-template-columns: 34px 1fr; }
+  .why-row__desc{ grid-column: span 2; margin-top:6px; }
+
+  .about__grid{ grid-template-columns: 1fr; }
+
+  .contact__grid{ grid-template-columns: 1fr; }
+  .contact-form{ grid-template-columns: 1fr; }
+  .field, .field--half{ grid-column: span 1; }
+  .contact-form__note{ grid-column: span 1; }
+
+  .footer__top{ grid-template-columns: 1fr; gap:26px; }
+}
+
+@media (max-width: 480px){
+  section{ padding-left: 20px; padding-right:20px; }
+  .hero{ padding-left:20px; padding-right:20px; }
+  .btn{ padding:14px 24px; font-size:0.9rem; }
+}
+
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="#top" class="nav__mark">Blizzo <span>Designers</span></a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#process">Process</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="login.html" class="nav__login" id="navAuthLink">Login</a>
+    </nav>
+
+    <a href="#contact" class="btn btn--nav">Start a Project</a>
+
+    <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <nav aria-label="Mobile">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#process">Process</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="login.html" id="navAuthLinkMobile">Login</a>
+    </nav>
+    <a href="#contact" class="btn btn--dark">Start a Project</a>
+    <p class="mobile-menu__meta">Coimbatore, India<br>+91 75502 86235</p>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <div class="hero__grid">
+      <p class="hero__kicker">Blizzo Designers — web design studio</p>
+
+      <h1 class="hero__headline">
+        <span class="reveal-line"><span>We build websites</span></span>
+        <span class="reveal-line"><span>that get noticed.</span></span>
+      </h1>
+
+      <div class="hero__foot">
+        <p class="hero__sub">Strategy, design and development for businesses that want to stand out online.</p>
+
+        <div class="hero__actions">
+          <a href="#contact" class="btn btn--primary btn--magnetic"><span>Start a Project</span></a>
+          <a href="#work" class="btn btn--ghost btn--magnetic"><span>View our work</span></a>
+        </div>
+      </div>
+    </div>
+
+    <p class="hero__trust">Web design · Development · Branding · Digital experiences</p>
+  </section>
+
+  <!-- ============ SELECTED WORK ============ -->
+  <section class="work" id="work">
+    <div class="section-head">
+      <h2>Selected work</h2>
+      <p>A studio is only as good as what it's shipped. Here's some of it.</p>
+    </div>
+
+    <article class="project" data-project="1">
+      <a href="#" class="project__visual" aria-label="View the National Interiors project">
+        <!-- TODO: replace with a real screenshot/mockup of nationalinteriors site -->
+        <svg class="project__mock" viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="National Interiors website preview">
+          <rect width="960" height="640" fill="#EDE7DC"/>
+          <rect x="0" y="0" width="960" height="64" fill="#12110F"/>
+          <rect x="48" y="24" width="150" height="16" rx="2" fill="#EDE7DC"/>
+          <rect x="700" y="22" width="210" height="20" rx="10" fill="#1E6F46"/>
+          <rect x="48" y="130" width="420" height="34" rx="2" fill="#12110F"/>
+          <rect x="48" y="178" width="360" height="34" rx="2" fill="#12110F"/>
+          <rect x="48" y="240" width="300" height="14" rx="2" fill="#5B5A54"/>
+          <rect x="48" y="264" width="230" height="14" rx="2" fill="#5B5A54"/>
+          <rect x="48" y="310" width="190" height="44" rx="4" fill="#1E6F46"/>
+          <rect x="540" y="120" width="372" height="260" rx="4" fill="#C9C2B2"/>
+          <rect x="0" y="440" width="960" height="200" fill="#E4DFD2"/>
+          <rect x="48" y="480" width="200" height="140" rx="4" fill="#C9C2B2"/>
+          <rect x="272" y="480" width="200" height="140" rx="4" fill="#C9C2B2"/>
+          <rect x="496" y="480" width="200" height="140" rx="4" fill="#C9C2B2"/>
+          <rect x="720" y="480" width="192" height="140" rx="4" fill="#C9C2B2"/>
+        </svg>
+      </a>
+      <div class="project__info">
+        <span class="project__index">01</span>
+        <h3>National Interiors</h3>
+        <p class="project__industry">Interior design &amp; UPVC fitting</p>
+        <p class="project__services">Web design · Development · WhatsApp enquiry system</p>
+        <p class="project__desc">A single-page site for a Tamil Nadu interior and UPVC fitting business, built to turn browsing into enquiries — service breakdowns, a filterable project gallery and instant quote requests that route straight to WhatsApp.</p>
+        <a href="#" class="link-arrow">View project</a>
+      </div>
+    </article>
+
+    <article class="project project--reverse" data-project="2">
+      <a href="#" class="project__visual" aria-label="View the Saleez project">
+        <!-- TODO: replace with a real screenshot/mockup of the Saleez site -->
+        <svg class="project__mock" viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Saleez website preview">
+          <rect width="960" height="640" fill="#12110F"/>
+          <rect x="0" y="0" width="960" height="64" fill="#0A0908"/>
+          <rect x="48" y="24" width="120" height="16" rx="2" fill="#EDE7DC"/>
+          <circle cx="880" cy="32" r="10" fill="#1E6F46"/>
+          <rect x="330" y="180" width="300" height="220" rx="6" fill="#2A2823"/>
+          <rect x="400" y="220" width="160" height="140" rx="60" fill="#EDE7DC" opacity="0.15"/>
+          <rect x="380" y="440" width="200" height="18" rx="2" fill="#EDE7DC" opacity="0.7"/>
+          <rect x="420" y="470" width="120" height="30" rx="15" fill="#1E6F46"/>
+          <rect x="48" y="520" width="150" height="80" rx="4" fill="#2A2823"/>
+          <rect x="216" y="520" width="150" height="80" rx="4" fill="#2A2823"/>
+          <rect x="384" y="520" width="150" height="80" rx="4" fill="#2A2823"/>
+          <rect x="552" y="520" width="150" height="80" rx="4" fill="#2A2823"/>
+          <rect x="720" y="520" width="192" height="80" rx="4" fill="#2A2823"/>
+        </svg>
+      </a>
+      <div class="project__info">
+        <span class="project__index">02</span>
+        <h3>Saleez</h3>
+        <p class="project__industry">Premium perfume &amp; e-commerce</p>
+        <p class="project__services">Web design · Development · E-commerce</p>
+        <p class="project__desc">An online store for a perfume brand, designed to feel as considered as the product itself — a calm, dark-toned browsing experience built around the bottle, not around the discount banner.</p>
+        <a href="#" class="link-arrow">View project</a>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section class="services" id="services">
+    <div class="section-head">
+      <h2>Services</h2>
+      <p>Everything a business needs to have a website that actually works for it.</p>
+    </div>
+
+    <ul class="service-list">
+      <li class="service-row">
+        <span class="service-row__index">01</span>
+        <h3 class="service-row__name">Web design</h3>
+        <p class="service-row__desc">Visual identity and interface design built around your brand, not a template.</p>
+      </li>
+      <li class="service-row">
+        <span class="service-row__index">02</span>
+        <h3 class="service-row__name">Web development</h3>
+        <p class="service-row__desc">Fast, responsive builds — clean code that's easy to maintain and extend later.</p>
+      </li>
+      <li class="service-row">
+        <span class="service-row__index">03</span>
+        <h3 class="service-row__name">E-commerce websites</h3>
+        <p class="service-row__desc">Online stores designed to make products look good and checkout feel easy.</p>
+      </li>
+      <li class="service-row">
+        <span class="service-row__index">04</span>
+        <h3 class="service-row__name">Business websites</h3>
+        <p class="service-row__desc">A credible, professional online presence for local and growing businesses.</p>
+      </li>
+      <li class="service-row">
+        <span class="service-row__index">05</span>
+        <h3 class="service-row__name">UI/UX design</h3>
+        <p class="service-row__desc">Interfaces and user journeys planned around how people actually browse and decide.</p>
+      </li>
+      <li class="service-row">
+        <span class="service-row__index">06</span>
+        <h3 class="service-row__name">Website maintenance</h3>
+        <p class="service-row__desc">Updates, fixes and small additions after launch, so the site keeps working for you.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ WHY US ============ -->
+  <section class="why" id="why">
+    <div class="section-head section-head--light">
+      <h2>Why work with us</h2>
+    </div>
+
+    <div class="why-list">
+      <div class="why-row">
+        <span class="why-row__index">01</span>
+        <p class="why-row__title">Designed for your business</p>
+        <p class="why-row__desc">Every website is tailored to the brand rather than built from a generic template.</p>
+      </div>
+      <div class="why-row">
+        <span class="why-row__index">02</span>
+        <p class="why-row__title">Mobile-first</p>
+        <p class="why-row__desc">Every experience is designed to work beautifully on phones, tablets and desktops.</p>
+      </div>
+      <div class="why-row">
+        <span class="why-row__index">03</span>
+        <p class="why-row__title">Built for conversion</p>
+        <p class="why-row__desc">Clear messaging, strong calls-to-action and thoughtful user journeys.</p>
+      </div>
+      <div class="why-row">
+        <span class="why-row__index">04</span>
+        <p class="why-row__title">Fast and modern</p>
+        <p class="why-row__desc">Clean development and performance-conscious implementation.</p>
+      </div>
+      <div class="why-row">
+        <span class="why-row__index">05</span>
+        <p class="why-row__title">Easy to maintain</p>
+        <p class="why-row__desc">Websites are structured so they can be updated and expanded later.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section class="process" id="process">
+    <div class="section-head">
+      <h2>Process</h2>
+      <p>Five stages, the same way every time — so nothing gets missed.</p>
+    </div>
+
+    <div class="process-track">
+      <div class="process-line" aria-hidden="true"><span class="process-line__fill" id="processFill"></span></div>
+
+      <div class="process-step">
+        <span class="process-step__index">01</span>
+        <h3>Discover</h3>
+        <p>Understand the business, audience and goals.</p>
+      </div>
+      <div class="process-step">
+        <span class="process-step__index">02</span>
+        <h3>Strategy</h3>
+        <p>Define the structure, content and user journey.</p>
+      </div>
+      <div class="process-step">
+        <span class="process-step__index">03</span>
+        <h3>Design</h3>
+        <p>Create the visual identity and interface.</p>
+      </div>
+      <div class="process-step">
+        <span class="process-step__index">04</span>
+        <h3>Develop</h3>
+        <p>Turn the design into a responsive, working website.</p>
+      </div>
+      <div class="process-step">
+        <span class="process-step__index">05</span>
+        <h3>Launch</h3>
+        <p>Test, optimise and launch.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="about" id="about">
+    <div class="about__grid">
+      <h2 class="about__lead">We're a small team focused on building websites that don't just look good — they make businesses look credible, memorable and ready for the next customer.</h2>
+
+      <div class="about__col">
+        <h4>Our approach</h4>
+        <p>We start with the business, not the template — what it sells, who it's for, and what a visitor needs to see before they'll trust it.</p>
+      </div>
+      <div class="about__col">
+        <h4>What we care about</h4>
+        <p>Clarity over decoration. A site that loads fast, reads clearly and makes the next step obvious beats one that just looks busy.</p>
+      </div>
+      <div class="about__col">
+        <h4>How we work</h4>
+        <p>Direct, mostly over WhatsApp. Fewer meetings, faster feedback, a site you've actually seen take shape.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLIENT TYPES ============ -->
+  <section class="clients">
+    <div class="section-head">
+      <h2>We build for</h2>
+    </div>
+    <div class="clients__cloud">
+      <span>Local businesses</span>
+      <span>Startups</span>
+      <span>Personal brands</span>
+      <span>Restaurants</span>
+      <span>Interior designers</span>
+      <span>E-commerce brands</span>
+      <span>Service businesses</span>
+      <span>Creators</span>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="testimonials">
+    <div class="section-head">
+      <h2>What clients say</h2>
+    </div>
+    <div class="testimonial-placeholder">
+      <p>We're gathering testimonials from recent projects — real client feedback will go here once it's in. No filler quotes in the meantime.</p>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta">
+    <h2>Have a project in mind?</h2>
+    <p>Tell us what you're building. We'll help turn the idea into a website.</p>
+    <div class="cta__actions">
+      <a href="#contact" class="btn btn--primary btn--magnetic"><span>Start a Project</span></a>
+      <a href="https://wa.me/917550286235?text=Hi%20Blizzo%20Designers%2C%20I%27d%20like%20to%20talk%20about%20a%20website%20project." class="btn btn--ghost-light btn--magnetic" target="_blank" rel="noopener"><span>WhatsApp us</span></a>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="contact" id="contact">
+    <div class="section-head">
+      <h2>Start a project</h2>
+      <p>Fill this in — we'll save it to our enquiry list and pick it up on WhatsApp.</p>
+    </div>
+
+    <div class="contact__grid">
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="field">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="field">
+          <label for="business">Business / brand</label>
+          <input type="text" id="business" name="business">
+        </div>
+        <div class="field field--half">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email">
+        </div>
+        <div class="field field--half">
+          <label for="phone">Phone / WhatsApp</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        <div class="field field--half">
+          <label for="projectType">Project type</label>
+          <select id="projectType" name="projectType">
+            <option>Business website</option>
+            <option>E-commerce</option>
+            <option>Landing page</option>
+            <option>Portfolio</option>
+            <option>Redesign</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field field--half">
+          <label for="budget">Budget range</label>
+          <select id="budget" name="budget">
+            <option>Under ₹15,000</option>
+            <option>₹15,000 – ₹40,000</option>
+            <option>₹40,000 – ₹1,00,000</option>
+            <option>Above ₹1,00,000</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="4" required></textarea>
+        </div>
+
+        <p class="contact-form__status" id="contactFormStatus" role="status" aria-live="polite"></p>
+
+        <button type="submit" class="btn btn--primary btn--magnetic btn--wide"><span>Send enquiry</span></button>
+        <p class="contact-form__note">This saves your enquiry for us and opens WhatsApp with your details filled in.</p>
+      </form>
+
+      <div class="contact-side">
+        <div class="contact-side__block">
+          <h4>WhatsApp</h4>
+          <a href="https://wa.me/917550286235" target="_blank" rel="noopener">+91 75502 86235</a>
+        </div>
+        <div class="contact-side__block">
+          <h4>Location</h4>
+          <p>Coimbatore, Tamil Nadu</p>
+        </div>
+        <a href="https://wa.me/917550286235?text=Hi%20Blizzo%20Designers%2C%20I%27d%20like%20to%20talk%20about%20a%20website%20project." class="btn btn--dark btn--wide" target="_blank" rel="noopener">Message us on WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer__top">
+    <div class="footer__brand">
+      <p class="footer__name">Blizzo Designers</p>
+      <p class="footer__tag">Designing better websites for ambitious businesses.</p>
+    </div>
+
+    <nav class="footer__nav" aria-label="Footer">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#process">Process</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="login.html">Login</a>
+    </nav>
+
+    <div class="footer__contact">
+      <a href="https://wa.me/917550286235" target="_blank" rel="noopener">+91 75502 86235</a>
+      <p>Coimbatore, India</p>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <p>© <span id="year"></span> Blizzo Designers. All rights reserved.</p>
+    <p>Built with intention.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var WHATSAPP_NUMBER = "917550286235";
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  /* ---------- Nav scroll state ---------- */
+  var nav = document.getElementById("nav");
+  function onScroll() {
+    if (window.scrollY > 12) nav.classList.add("is-scrolled");
+    else nav.classList.remove("is-scrolled");
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  /* ---------- Mobile menu ---------- */
+  var toggle = document.getElementById("navToggle");
+  var mobileMenu = document.getElementById("mobileMenu");
+  toggle.addEventListener("click", function () {
+    var open = mobileMenu.classList.toggle("is-open");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    document.body.style.overflow = open ? "hidden" : "";
+  });
+  mobileMenu.querySelectorAll("a").forEach(function (a) {
+    a.addEventListener("click", function () {
+      mobileMenu.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    });
+  });
+
+  /* ---------- Hero entrance (one orchestrated reveal) ---------- */
+  var hero = document.querySelector(".hero");
+  requestAnimationFrame(function () {
+    setTimeout(function () { hero.classList.add("is-ready"); }, 120);
+  });
+
+  /* ---------- Scroll reveals ---------- */
+  var revealTargets = document.querySelectorAll(
+    ".project, .service-row, .why-row, .process-step, .about__col, .testimonial-placeholder"
+  );
+  revealTargets.forEach(function (el) { el.classList.add("reveal-on-scroll"); });
+
+  if ("IntersectionObserver" in window && !reduceMotion) {
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
+    );
+    revealTargets.forEach(function (el) { io.observe(el); });
+  } else {
+    revealTargets.forEach(function (el) { el.classList.add("is-visible"); });
+  }
+
+  /* ---------- Process progress line ---------- */
+  var track = document.querySelector(".process-track");
+  var fill = document.getElementById("processFill");
+  function updateProcessLine() {
+    if (!track || !fill) return;
+    var rect = track.getBoundingClientRect();
+    var vh = window.innerHeight;
+    var start = vh * 0.85;
+    var total = rect.height + vh * 0.4;
+    var progressed = start - rect.top;
+    var pct = Math.max(0, Math.min(1, progressed / total));
+    fill.style.height = (pct * 100) + "%";
+  }
+  updateProcessLine();
+  window.addEventListener("scroll", updateProcessLine, { passive: true });
+  window.addEventListener("resize", updateProcessLine);
+
+  /* ---------- Magnetic buttons ---------- */
+  if (!reduceMotion && window.matchMedia("(hover: hover)").matches) {
+    document.querySelectorAll(".btn--magnetic").forEach(function (btn) {
+      var inner = btn.querySelector("span");
+      btn.addEventListener("mousemove", function (e) {
+        var r = btn.getBoundingClientRect();
+        var x = e.clientX - r.left - r.width / 2;
+        var y = e.clientY - r.top - r.height / 2;
+        btn.style.transform = "translate(" + x * 0.18 + "px," + y * 0.35 + "px)";
+        if (inner) inner.style.transform = "translate(" + x * 0.08 + "px," + y * 0.15 + "px)";
+      });
+      btn.addEventListener("mouseleave", function () {
+        btn.style.transform = "";
+        if (inner) inner.style.transform = "";
+      });
+    });
+  }
+
+  /* ---------- Auth-aware nav link ---------- */
+  (async function setupAuthLink() {
+    var links = [document.getElementById("navAuthLink"), document.getElementById("navAuthLinkMobile")];
+    if (!window.blizzoSupabase) return;
+    try {
+      var sessionRes = await window.blizzoSupabase.auth.getSession();
+      var session = sessionRes.data && sessionRes.data.session;
+      if (!session) return;
+      var profile = await window.blizzoGetProfile(session.user.id);
+      var target = profile && profile.role === "admin" ? "admin.html" : "dashboard.html";
+      var label = profile && profile.role === "admin" ? "Admin" : "My dashboard";
+      links.forEach(function (a) {
+        if (!a) return;
+        a.href = target;
+        a.textContent = label;
+      });
+    } catch (err) {
+      /* not logged in or Supabase not configured yet — leave default Login link */
+    }
+  })();
+
+  /* ---------- Contact form -> Supabase ---------- */
+  var form = document.getElementById("contactForm");
+  var statusEl = document.getElementById("contactFormStatus");
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    var data = new FormData(form);
+    var submitBtn = form.querySelector("button[type=submit]");
+
+    var record = {
+      name: data.get("name"),
+      business: data.get("business") || null,
+      email: data.get("email") || null,
+      phone: data.get("phone"),
+      project_type: data.get("projectType"),
+      budget: data.get("budget"),
+      message: data.get("message")
+    };
+
+    submitBtn.disabled = true;
+    statusEl.textContent = "Sending…";
+    statusEl.removeAttribute("data-state");
+
+    if (!window.blizzoSupabase) {
+      statusEl.textContent = "Couldn't send — the site isn't connected to the database yet.";
+      statusEl.setAttribute("data-state", "error");
+      submitBtn.disabled = false;
+      return;
+    }
+
+    try {
+      var result = await window.blizzoSupabase.from("enquiries").insert(record);
+      if (result.error) throw result.error;
+      statusEl.textContent = "Thanks — your enquiry has been sent. We'll be in touch soon.";
+      statusEl.setAttribute("data-state", "ok");
+      form.reset();
+    } catch (err) {
+      console.error("Enquiry save failed:", err);
+      statusEl.textContent = "Something went wrong sending your enquiry — please try again or WhatsApp us directly.";
+      statusEl.setAttribute("data-state", "error");
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+})();
+
+</script>
+</body>
+</html>

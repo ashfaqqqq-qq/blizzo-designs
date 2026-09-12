@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your dashboard — Blizzo Designers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121212'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' fill='%231E6F46' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="topbar__mark">Blizzo <span>Designers</span></a>
+  <div class="topbar__right">
+    <span class="topbar__user" id="userLabel"></span>
+    <button class="btn btn--ghost btn--sm" id="signOutBtn">Sign out</button>
+  </div>
+</header>
+
+<main class="dash">
+  <div class="dash__head">
+    <h1 id="greeting">Your projects</h1>
+    <p>Status and updates on work we're doing for you.</p>
+  </div>
+
+  <div id="projectList">
+    <p class="dash__empty">Loading your projects…</p>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = str == null ? "" : String(str);
+    return div.innerHTML;
+  }
+
+  function formatDate(iso) {
+    try {
+      return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function statusLabel(status) {
+    return String(status || "").replace(/_/g, " ");
+  }
+
+  document.getElementById("signOutBtn").addEventListener("click", function () {
+    window.blizzoSignOut();
+  });
+
+  (async function init() {
+    var auth = await window.blizzoRequireRole("customer");
+    if (!auth) return; // already redirected
+
+    var name = auth.profile.full_name || auth.profile.email;
+    document.getElementById("userLabel").textContent = name;
+    document.getElementById("greeting").textContent = "Welcome back" + (auth.profile.full_name ? ", " + auth.profile.full_name.split(" ")[0] : "");
+
+    var projectsRes = await window.blizzoSupabase
+      .from("projects")
+      .select("*")
+      .eq("customer_id", auth.session.user.id)
+      .order("created_at", { ascending: false });
+
+    var listEl = document.getElementById("projectList");
+
+    if (projectsRes.error) {
+      listEl.innerHTML = '<p class="dash__empty">Couldn\'t load your projects: ' + escapeHtml(projectsRes.error.message) + '</p>';
+      return;
+    }
+
+    var projects = projectsRes.data || [];
+    if (!projects.length) {
+      listEl.innerHTML = '<p class="dash__empty">No projects linked to your account yet. Once Blizzo Designers starts work, it\'ll show up here.</p>';
+      return;
+    }
+
+    var updatesRes = await window.blizzoSupabase
+      .from("project_updates")
+      .select("*")
+      .in("project_id", projects.map(function (p) { return p.id; }))
+      .order("created_at", { ascending: false });
+
+    var updatesByProject = {};
+    (updatesRes.data || []).forEach(function (u) {
+      if (!updatesByProject[u.project_id]) updatesByProject[u.project_id] = [];
+      updatesByProject[u.project_id].push(u);
+    });
+
+    listEl.innerHTML = projects.map(function (proj) {
+      var updates = updatesByProject[proj.id] || [];
+      return (
+        '<article class="project-card">' +
+          '<div class="project-card__top">' +
+            '<div>' +
+              '<p class="project-card__name">' + escapeHtml(proj.name) + '</p>' +
+              '<p class="project-card__meta">Started ' + formatDate(proj.created_at) + '</p>' +
+            '</div>' +
+            '<span class="badge badge--' + proj.status + '">' + escapeHtml(statusLabel(proj.status)) + '</span>' +
+          '</div>' +
+          (updates.length
+            ? '<div class="updates">' +
+                '<p class="section-label">Updates</p>' +
+                updates.map(function (u) {
+                  return (
+                    '<div class="update">' +
+                      '<span class="update__dot" aria-hidden="true"></span>' +
+                      '<div>' +
+                        '<p class="update__title">' + escapeHtml(u.title) + '</p>' +
+                        '<p class="update__date">' + formatDate(u.created_at) + '</p>' +
+                        (u.note ? '<p class="update__note">' + escapeHtml(u.note) + '</p>' : '') +
+                      '</div>' +
+                    '</div>'
+                  );
+                }).join('') +
+              '</div>'
+            : '') +
+        '</article>'
+      );
+    }).join("");
+  })();
+})();
+</script>
+</body>
+</html>

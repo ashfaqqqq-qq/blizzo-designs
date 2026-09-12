@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — Blizzo Designers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121212'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' fill='%231E6F46' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-card">
+    <a href="index.html" class="auth-card__mark">Blizzo <span>Designers</span></a>
+    <h1>Log in</h1>
+    <p class="auth-card__sub">For clients and the Blizzo team. Admins and customers use the same form — you'll land on the right dashboard.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password">
+      </div>
+      <p style="margin-top:10px; font-size:0.85rem;"><a href="forgot-password.html" style="color: var(--grey); border-bottom:1px solid var(--line);">Forgot your password?</a></p>
+
+      <p class="auth-card__status" id="loginStatus" role="status" aria-live="polite"></p>
+
+      <button type="submit" class="btn btn--primary btn--wide auth-card__submit" id="loginSubmit">Log in</button>
+    </form>
+
+    <p class="auth-card__foot">New client? <a href="signup.html">Create an account</a></p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var form = document.getElementById("loginForm");
+  var statusEl = document.getElementById("loginStatus");
+  var submitBtn = document.getElementById("loginSubmit");
+
+  // If already logged in, skip straight to the right dashboard.
+  (async function redirectIfSignedIn() {
+    if (!window.blizzoSupabase) return;
+    var sessionRes = await window.blizzoSupabase.auth.getSession();
+    var session = sessionRes.data && sessionRes.data.session;
+    if (!session) return;
+    var profile = await window.blizzoGetProfile(session.user.id);
+    if (!profile) {
+      // Session exists but no profiles row was found — do NOT redirect
+      // (dashboard.html/admin.html would just bounce back here in a loop).
+      statusEl.textContent = "You're logged in, but no profile was found for this account. Contact Blizzo Designers.";
+      statusEl.setAttribute("data-state", "error");
+      return;
+    }
+    window.location.href = profile.role === "admin" ? "admin.html" : "dashboard.html";
+  })();
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    statusEl.removeAttribute("data-state");
+
+    if (!window.blizzoSupabase) {
+      statusEl.textContent = "Supabase isn't configured yet — add your project URL and key to supabase-config.js.";
+      statusEl.setAttribute("data-state", "error");
+      return;
+    }
+
+    var email = document.getElementById("email").value.trim();
+    var password = document.getElementById("password").value;
+
+    submitBtn.disabled = true;
+    statusEl.textContent = "Logging in…";
+
+    var result = await window.blizzoSupabase.auth.signInWithPassword({ email: email, password: password });
+
+    if (result.error) {
+      statusEl.textContent = result.error.message || "Couldn't log in — check your email and password.";
+      statusEl.setAttribute("data-state", "error");
+      submitBtn.disabled = false;
+      return;
+    }
+
+    var profile = await window.blizzoGetProfile(result.data.user.id);
+    if (!profile) {
+      statusEl.textContent = "Logged in, but no profile was found for this account. Contact Blizzo Designers.";
+      statusEl.setAttribute("data-state", "error");
+      submitBtn.disabled = false;
+      return;
+    }
+
+    statusEl.textContent = "Logged in — redirecting…";
+    statusEl.setAttribute("data-state", "ok");
+    window.location.href = profile.role === "admin" ? "admin.html" : "dashboard.html";
+  });
+})();
+</script>
+</body>
+</html>

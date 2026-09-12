@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create an account — Blizzo Designers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121212'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' fill='%231E6F46' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
+<style>
+  .otp-input{
+    font-size:1.6rem; letter-spacing:0.5em; text-align:center; font-family: var(--font-body);
+  }
+  .step{ display:none; }
+  .step.is-active{ display:block; }
+  .resend-row{ margin-top:16px; font-size:0.88rem; color: var(--grey); text-align:center; }
+  .resend-row button{ background:none; border:none; padding:0; color: var(--ink); border-bottom:1px solid var(--ink); font-size:inherit; }
+  .resend-row button:disabled{ color: var(--grey); border-color: var(--grey); cursor:default; }
+  .otp-sent-to{ margin-top:8px; color: var(--grey); font-size:0.88rem; }
+  .otp-sent-to strong{ color: var(--ink); font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-card">
+    <a href="index.html" class="auth-card__mark">Blizzo <span>Designers</span></a>
+
+    <!-- ---------- STEP 1: details ---------- -->
+    <div class="step is-active" id="stepDetails">
+      <h1>Create an account</h1>
+      <p class="auth-card__sub">For clients we're building a site for. Once you're in, you'll see your project's status here.</p>
+
+      <form id="signupForm" novalidate>
+        <div class="field">
+          <label for="fullName">Full name</label>
+          <input type="text" id="fullName" name="fullName" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required minlength="6" autocomplete="new-password">
+        </div>
+
+        <p class="auth-card__status" id="signupStatus" role="status" aria-live="polite"></p>
+
+        <button type="submit" class="btn btn--primary btn--wide auth-card__submit" id="signupSubmit">Send verification code</button>
+      </form>
+
+      <p class="auth-card__foot">Already have an account? <a href="login.html">Log in</a></p>
+    </div>
+
+    <!-- ---------- STEP 2: verify OTP ---------- -->
+    <div class="step" id="stepVerify">
+      <h1>Check your email</h1>
+      <p class="auth-card__sub">Enter the 6-digit code we just sent you.</p>
+      <p class="otp-sent-to">Sent to <strong id="otpEmailLabel"></strong></p>
+
+      <form id="otpForm" novalidate>
+        <div class="field">
+          <label for="otpCode">Verification code</label>
+          <input type="text" id="otpCode" name="otpCode" class="otp-input" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required>
+        </div>
+
+        <p class="auth-card__status" id="otpStatus" role="status" aria-live="polite"></p>
+
+        <button type="submit" class="btn btn--primary btn--wide auth-card__submit" id="otpSubmit">Verify &amp; create account</button>
+      </form>
+
+      <p class="resend-row">
+        Didn't get it? <button type="button" id="resendBtn">Resend code</button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var stepDetails = document.getElementById("stepDetails");
+  var stepVerify = document.getElementById("stepVerify");
+
+  var signupForm = document.getElementById("signupForm");
+  var signupStatus = document.getElementById("signupStatus");
+  var signupSubmit = document.getElementById("signupSubmit");
+
+  var otpForm = document.getElementById("otpForm");
+  var otpStatus = document.getElementById("otpStatus");
+  var otpSubmit = document.getElementById("otpSubmit");
+  var otpEmailLabel = document.getElementById("otpEmailLabel");
+  var resendBtn = document.getElementById("resendBtn");
+
+  var pendingEmail = "";
+  var pendingFullName = "";
+  var pendingPassword = "";
+  var resendCooldown = 0;
+  var resendTimer = null;
+
+  function showStep(step) {
+    [stepDetails, stepVerify].forEach(function (s) { s.classList.toggle("is-active", s === step); });
+  }
+
+  function startResendCooldown() {
+    resendCooldown = 30;
+    resendBtn.disabled = true;
+    resendBtn.textContent = "Resend code (" + resendCooldown + "s)";
+    clearInterval(resendTimer);
+    resendTimer = setInterval(function () {
+      resendCooldown -= 1;
+      if (resendCooldown <= 0) {
+        clearInterval(resendTimer);
+        resendBtn.disabled = false;
+        resendBtn.textContent = "Resend code";
+      } else {
+        resendBtn.textContent = "Resend code (" + resendCooldown + "s)";
+      }
+    }, 1000);
+  }
+
+  // ---------- Step 1: create the account, triggering Supabase's OTP email ----------
+  signupForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    signupStatus.removeAttribute("data-state");
+
+    if (!window.blizzoSupabase) {
+      signupStatus.textContent = "Supabase isn't configured yet — add your project URL and key to supabase-config.js.";
+      signupStatus.setAttribute("data-state", "error");
+      return;
+    }
+
+    pendingFullName = document.getElementById("fullName").value.trim();
+    pendingEmail = document.getElementById("email").value.trim();
+    pendingPassword = document.getElementById("password").value;
+
+    signupSubmit.disabled = true;
+    signupStatus.textContent = "Sending your code…";
+
+    var result = await window.blizzoSupabase.auth.signUp({
+      email: pendingEmail,
+      password: pendingPassword,
+      options: { data: { full_name: pendingFullName } }
+    });
+
+    if (result.error) {
+      signupStatus.textContent = result.error.message || "Couldn't create the account.";
+      signupStatus.setAttribute("data-state", "error");
+      signupSubmit.disabled = false;
+      return;
+    }
+
+    signupSubmit.disabled = false;
+
+    // If the project has email confirmations turned off, Supabase returns
+    // a session immediately — no code needed, skip straight to the dashboard.
+    if (result.data.session) {
+      window.location.href = "dashboard.html";
+      return;
+    }
+
+    otpEmailLabel.textContent = pendingEmail;
+    otpStatus.textContent = "";
+    otpStatus.removeAttribute("data-state");
+    document.getElementById("otpCode").value = "";
+    showStep(stepVerify);
+    startResendCooldown();
+    document.getElementById("otpCode").focus();
+  });
+
+  // ---------- Step 2: verify the code ----------
+  otpForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    otpStatus.removeAttribute("data-state");
+
+    var code = document.getElementById("otpCode").value.trim();
+    if (!code) return;
+
+    otpSubmit.disabled = true;
+    otpStatus.textContent = "Verifying…";
+
+    var result = await window.blizzoSupabase.auth.verifyOtp({
+      email: pendingEmail,
+      token: code,
+      type: "signup"
+    });
+
+    if (result.error) {
+      otpStatus.textContent = result.error.message || "That code didn't work — check it and try again.";
+      otpStatus.setAttribute("data-state", "error");
+      otpSubmit.disabled = false;
+      return;
+    }
+
+    otpStatus.textContent = "Verified — redirecting…";
+    otpStatus.setAttribute("data-state", "ok");
+    window.location.href = "dashboard.html";
+  });
+
+  // ---------- Resend the code ----------
+  resendBtn.addEventListener("click", async function () {
+    if (resendBtn.disabled) return;
+    otpStatus.textContent = "Resending…";
+    otpStatus.removeAttribute("data-state");
+
+    var result = await window.blizzoSupabase.auth.resend({
+      type: "signup",
+      email: pendingEmail
+    });
+
+    if (result.error) {
+      otpStatus.textContent = result.error.message || "Couldn't resend the code.";
+      otpStatus.setAttribute("data-state", "error");
+      return;
+    }
+
+    otpStatus.textContent = "New code sent.";
+    otpStatus.setAttribute("data-state", "ok");
+    startResendCooldown();
+  });
+})();
+</script>
+</body>
+</html>
