@@ -177,3 +177,41 @@ button{ font-family:inherit; cursor:pointer; }
   .dash{ padding: 32px 20px 80px; }
   .enquiry-card__top, .project-card__top{ flex-direction:column; }
 }
+
+/* ---- OTP entry boxes ---- */
+.otp-boxes{ display:flex; gap:10px; justify-content:center; }
+.otp-boxes input{
+  width:100%; max-width:48px; aspect-ratio:1/1; text-align:center;
+  font-size:1.4rem; font-weight:700; font-family: var(--font-display);
+  border:2px solid #E6E1F5; border-radius:10px; color: var(--ink); background:#fff;
+}
+.otp-boxes input:focus{ border-color: var(--purple); outline:none; }
+
+/* ---- auth method tabs (Email / Phone) ---- */
+.auth-tabs{ display:flex; gap:8px; margin-top:24px; background:#F3F0FB; border-radius:999px; padding:4px; }
+.auth-tabs button{
+  flex:1; background:none; border:none; padding:10px 0; border-radius:999px;
+  font-family: var(--font-display); font-weight:600; font-size:0.9rem; color: #6B6480;
+}
+.auth-tabs button.is-active{ background:#fff; color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* ---- divider + Google button ---- */
+.auth-divider{ display:flex; align-items:center; gap:14px; margin:26px 0; color:#9A93A8; font-size:0.82rem; font-weight:600; }
+.auth-divider::before, .auth-divider::after{ content:""; flex:1; height:1px; background:#E6E1F5; }
+.btn--google{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:100%; background:#fff; border:2px solid #E6E1F5; color: var(--ink);
+  padding:12px 20px; border-radius:999px; font-family: var(--font-display); font-weight:600; font-size:0.92rem;
+  box-shadow: 0 4px 0 #E6E1F5;
+  transition: background .2s var(--ease), border-color .2s var(--ease), transform .2s var(--bounce), box-shadow .2s var(--bounce);
+}
+.btn--google:hover{ background:#F7F5FC; border-color:#D8D2EE; transform: translateY(-2px); box-shadow: 0 6px 0 #D8D2EE; }
+.btn--google:active{ transform: translateY(2px); box-shadow: 0 2px 0 #D8D2EE; }
+.btn--google svg{ flex-shrink:0; transition: transform .3s var(--bounce); }
+.btn--google:hover svg{ transform: rotate(-8deg) scale(1.1); }
+
+.auth-back{ display:inline-flex; align-items:center; gap:6px; color:#6B6480; font-size:0.85rem; font-weight:600; margin-bottom:18px; }
+
+/* ---- multi-step flow (signup/login: details -> verify) ---- */
+.step{ display:none; }
+.step.is-active{ display:block; }
