@@ -6,8 +6,8 @@
    3. Paste your project URL and anon public key below
    ========================================================== */
 
-var BLIZZO_SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL"; // e.g. https://xxxxx.supabase.co
-var BLIZZO_SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+var BLIZZO_SUPABASE_URL = "https://fozoppmlynikmlbtqgvl.supabase.co"; // e.g. https://xxxxx.supabase.co
+var BLIZZO_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvem9wcG1seW5pa21sYnRxZ3ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxODAwMjEsImV4cCI6MjEwNDc1NjAyMX0.LDUqzVmO3mRetw-WCQa7qzvTCo2jcGRIhWy9ra-_o7o";
 
 window.blizzoSupabase = null;
 
