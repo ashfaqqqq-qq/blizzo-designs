@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Log in — Blizzo Designers</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121212'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' fill='%231E6F46' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='28' fill='%23100C18'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' fill='%239B4DFF' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,6 +17,13 @@
     <a href="index.html" class="auth-card__mark">Blizzo <span>Designers</span></a>
     <h1>Log in</h1>
     <p class="auth-card__sub">For clients and the Blizzo team. Admins and customers use the same form — you'll land on the right dashboard.</p>
+
+    <button type="button" class="btn--google" id="googleBtn" style="margin-top:24px;">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.97v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.97A9 9 0 0 0 0 9c0 1.45.35 2.83.97 4.03l2.98-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .97 4.97L3.95 7.3C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="auth-divider">or</div>
 
     <form id="loginForm" novalidate>
       <div class="field">
@@ -44,8 +51,8 @@
 (function () {
   "use strict";
 
+  var loginStatus = document.getElementById("loginStatus");
   var form = document.getElementById("loginForm");
-  var statusEl = document.getElementById("loginStatus");
   var submitBtn = document.getElementById("loginSubmit");
 
   // If already logged in, skip straight to the right dashboard.
@@ -56,22 +63,31 @@
     if (!session) return;
     var profile = await window.blizzoGetProfile(session.user.id);
     if (!profile) {
-      // Session exists but no profiles row was found — do NOT redirect
-      // (dashboard.html/admin.html would just bounce back here in a loop).
-      statusEl.textContent = "You're logged in, but no profile was found for this account. Contact Blizzo Designers.";
-      statusEl.setAttribute("data-state", "error");
+      loginStatus.textContent = "You're logged in, but no profile was found for this account. Contact Blizzo Designers.";
+      loginStatus.setAttribute("data-state", "error");
       return;
     }
     window.location.href = profile.role === "admin" ? "admin.html" : "dashboard.html";
   })();
 
+  // ---------- Google sign-in ----------
+  document.getElementById("googleBtn").addEventListener("click", async function () {
+    if (!window.blizzoSupabase) {
+      alert("Supabase isn't configured yet — add your project URL and key to supabase-config.js.");
+      return;
+    }
+    var result = await window.blizzoSignInWithGoogle();
+    if (result.error) alert(result.error.message || "Couldn't start Google sign-in.");
+  });
+
+  // ---------- Email + password login ----------
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    statusEl.removeAttribute("data-state");
+    loginStatus.removeAttribute("data-state");
 
     if (!window.blizzoSupabase) {
-      statusEl.textContent = "Supabase isn't configured yet — add your project URL and key to supabase-config.js.";
-      statusEl.setAttribute("data-state", "error");
+      loginStatus.textContent = "Supabase isn't configured yet — add your project URL and key to supabase-config.js.";
+      loginStatus.setAttribute("data-state", "error");
       return;
     }
 
@@ -79,27 +95,27 @@
     var password = document.getElementById("password").value;
 
     submitBtn.disabled = true;
-    statusEl.textContent = "Logging in…";
+    loginStatus.textContent = "Logging in…";
 
     var result = await window.blizzoSupabase.auth.signInWithPassword({ email: email, password: password });
 
     if (result.error) {
-      statusEl.textContent = result.error.message || "Couldn't log in — check your email and password.";
-      statusEl.setAttribute("data-state", "error");
+      loginStatus.textContent = window.blizzoFriendlyAuthError(result.error);
+      loginStatus.setAttribute("data-state", "error");
       submitBtn.disabled = false;
       return;
     }
 
     var profile = await window.blizzoGetProfile(result.data.user.id);
     if (!profile) {
-      statusEl.textContent = "Logged in, but no profile was found for this account. Contact Blizzo Designers.";
-      statusEl.setAttribute("data-state", "error");
+      loginStatus.textContent = "Logged in, but no profile was found for this account. Contact Blizzo Designers.";
+      loginStatus.setAttribute("data-state", "error");
       submitBtn.disabled = false;
       return;
     }
 
-    statusEl.textContent = "Logged in — redirecting…";
-    statusEl.setAttribute("data-state", "ok");
+    loginStatus.textContent = "Logged in — redirecting…";
+    loginStatus.setAttribute("data-state", "ok");
     window.location.href = profile.role === "admin" ? "admin.html" : "dashboard.html";
   });
 })();
